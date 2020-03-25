@@ -30,6 +30,10 @@ public class Match {
 	// Users who matched to this user
 	List<String> from	= new ArrayList<>();
 	
+	public Match () {}
+	public Match(String username) {
+		this.username = username;
+	}
 	public String getId() {
 		return id;
 	}
