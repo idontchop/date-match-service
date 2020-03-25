@@ -11,8 +11,11 @@ import com.mongodb.client.MongoClients;
 @Configuration
 public class MongoConfig {
 	
-	@Value ("${spring.data.mongodb.database")
+	@Value ("${spring.datasource.mongo.database}")
 	private String dbName;
+	
+	//@Value ("${spring.application.type}")
+	//private String matchType;
   
     @Bean
     public MongoClient mongo() {

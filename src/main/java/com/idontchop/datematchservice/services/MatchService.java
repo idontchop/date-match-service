@@ -62,25 +62,25 @@ public class MatchService {
 	 * 
 	 * @param to
 	 */
-	private void updateOrAddTos ( String name, List<String> to ) {
+	public void updateOrAddTos ( String name, List<String> to ) {
 		
 		// Creates a list of users not found in db
 		List<String> adds = matchRepository.findNameByNameIn(to);
 		
+		// Find users not in DB
+		Set<String> toDif = new HashSet<>(to);
+		toDif.removeAll(adds);
+		
 		// Add the new user and save their from
-		adds.forEach( newUser -> {
+		toDif.forEach( newUser -> {
 			Match newMatch = new Match(newUser);
 			newMatch.addTo(name);
 			matchRepository.save(newMatch);
 		});
 		
 		// Update those users already saved by using native mongo
-		Set<String> toDif = new HashSet<>(to);
-		toDif.removeAll(adds);
-		
-		// Perform the mongo update
 		Query query = new Query ();
-		query.addCriteria(Criteria.where(DBNAME).in(toDif));
+		query.addCriteria(Criteria.where(DBNAME).in(adds));
 		Update update = new Update().addToSet(DBFROM, name);
 		mongoTemplate.updateFirst(query, update, Match.class);
 		

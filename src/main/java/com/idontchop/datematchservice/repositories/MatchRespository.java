@@ -9,6 +9,7 @@ import com.idontchop.datematchservice.entities.Match;
 
 public interface MatchRespository extends MongoRepository<Match, String> {
 
+	@Query ("")
 	public List<String> findNameByNameIn(List<String> name);
 	public Optional<Match> findByName(String user);
 }

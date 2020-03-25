@@ -2,11 +2,12 @@ spring:
   application:
     name: ${SERVICE:match-service}
     type: ${MATCH:match}
+  datasource:
+    mongo:
+      database: ${MONGODB:match}
   data:
     rest:
       basePath: /data
-    mongodb:
-      database: ${DB:match}
 server:
   port: ${PORT:8930}
 eureka:
