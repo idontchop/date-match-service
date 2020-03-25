@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -65,23 +66,25 @@ public class MatchService {
 	public void updateOrAddTos ( String name, List<String> to ) {
 		
 		// Creates a list of users not found in db
-		List<String> adds = matchRepository.findNameByNameIn(to);
+		// Easy but not optimal - Should collection useing MongoTemplate
+		List<String> adds = matchRepository.findNameByNameIn(to)
+				.stream().map(Match::getName).collect(Collectors.toList());
 		
 		// Find users not in DB
 		Set<String> toDif = new HashSet<>(to);
 		toDif.removeAll(adds);
-		
+
 		// Add the new user and save their from
 		toDif.forEach( newUser -> {
 			Match newMatch = new Match(newUser);
-			newMatch.addTo(name);
+			newMatch.addFrom(name);
 			matchRepository.save(newMatch);
 		});
 		
 		// Update those users already saved by using native mongo
 		Query query = new Query ();
 		query.addCriteria(Criteria.where(DBNAME).in(adds));
-		Update update = new Update().addToSet(DBFROM, name);
+		Update update = new Update().addToSet(DBTO, name);
 		mongoTemplate.updateFirst(query, update, Match.class);
 		
 	}
