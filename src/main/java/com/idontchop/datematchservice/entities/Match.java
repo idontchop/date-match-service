@@ -22,7 +22,7 @@ public class Match {
 	private String id;
 	
 	// username supplied by API
-	String username;
+	String name;
 	
 	// Users this user has matched to
 	List<String> to = new ArrayList<>();
@@ -31,9 +31,10 @@ public class Match {
 	List<String> from	= new ArrayList<>();
 	
 	public Match () {}
-	public Match(String username) {
-		this.username = username;
+	public Match(String name) {
+		this.name = name;
 	}
+	
 	public String getId() {
 		return id;
 	}
@@ -41,16 +42,29 @@ public class Match {
 		this.id = id;
 	}
 	public String getUsername() {
-		return username;
+		return name;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	public void setUsername(String username) {
-		this.username = username;
+		this.name = username;
 	}
 	public List<String> getTo() {
 		return to;
 	}
 	public void setTo(List<String> to) {
 		this.to = to;
+	}
+	
+	public void addFrom (String name) {
+		from.add(name);
+	}
+	public void addTo (String name) {
+		to.add(name);
 	}
 	public List<String> getFrom() {
 		return from;

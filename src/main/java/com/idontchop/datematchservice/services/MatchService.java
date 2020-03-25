@@ -1,9 +1,16 @@
 package com.idontchop.datematchservice.services;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.idontchop.datematchservice.entities.Match;
@@ -11,6 +18,12 @@ import com.idontchop.datematchservice.repositories.MatchRespository;
 
 @Service
 public class MatchService {
+	
+	// Database fields in the Match Document
+	// TODO: set these to property values
+	private final String DBNAME 	= 	"name";
+	private final String DBTO		=	"to";
+	private final String DBFROM		=	"from";
 	
 	@Autowired
 	MongoTemplate mongoTemplate;
@@ -27,15 +40,49 @@ public class MatchService {
 	 * @param to
 	 * @return
 	 */
-	public Match addMatch (String username, String to ) {
-		Match user = retrieveOrAdd(username);
-		Match toUser = retrieveOrAdd(to);
+	public Match addMatch (String name, List<String> to ) {
+		Match user = retrieveOrAdd(name);
+		List<Match> toUser = retrieveOrAdd(to);
 		
-		/*
-		 * If we end up doing a repo.save, then the save in retrieveoradd not necessary
-		 * but if we use mongotemplate.push, then it will need to be saved before (later
-		 * probably better)
-		 */
+		Query query = new Query();
+		query.addCriteria(Criteria.where("name").is(name));
+		
+		Update update = new Update().addToSet("to").each(to);
+		
+		mongoTemplate.updateFirst(query, update, Match.class);
+		
+		
+		return null;
+	}
+	
+	/**
+	 * Takes a list of the Tos and updates their records
+	 * or creates a new record. Any record saved will need
+	 * the from field updated.
+	 * 
+	 * @param to
+	 */
+	private void updateOrAddTos ( String name, List<String> to ) {
+		
+		// Creates a list of users not found in db
+		List<String> adds = matchRepository.findNameByNameIn(to);
+		
+		// Add the new user and save their from
+		adds.forEach( newUser -> {
+			Match newMatch = new Match(newUser);
+			newMatch.addTo(name);
+			matchRepository.save(newMatch);
+		});
+		
+		// Update those users already saved by using native mongo
+		Set<String> toDif = new HashSet<>(to);
+		toDif.removeAll(adds);
+		
+		// Perform the mongo update
+		Query query = new Query ();
+		query.addCriteria(Criteria.where(DBNAME).in(toDif));
+		Update update = new Update().addToSet(DBFROM, name);
+		mongoTemplate.updateFirst(query, update, Match.class);
 		
 	}
 	
@@ -46,15 +93,29 @@ public class MatchService {
 	 * @return
 	 */
 	private Match retrieveOrAdd (String username ) {
-		return 
-			matchRepository.findByName(username)
-				.orElse(new Match(username));
+		 
+		Optional<Match> match = matchRepository.findByName(username);
 		
-		/* Not necessary right?
-		return match.orElseGet( () -> {
-			
+		return match.orElseGet( () -> {			
 			return matchRepository.save( new Match (username) );
-		}); */
+		}); 
+	}
+	
+	/**
+	 * Returns a list of Matches based on list of users. If the Match isn't found
+	 * in the database, it will be created and saved.
+	 * 
+	 * @param users
+	 * @return
+	 */
+	private List<Match> retrieveOrAdd ( List <String> users ) {
+		
+		List<Match> retVal = new ArrayList<>();
+		users.forEach( user -> {
+			retVal.add( retrieveOrAdd(user) );
+		});
+		
+		return retVal;
 	}
 
 }
