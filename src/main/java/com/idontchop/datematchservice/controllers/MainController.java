@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.idontchop.datematchservice.dtos.RestMessage;
 
+/**
+ * Manipulation for users and matches here since they mainly go together.
+ * A match always contains two users and will auto create the user.
+ * @author nate
+ *
+ */
 @RestController
 public class MainController {
 	
