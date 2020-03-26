@@ -36,6 +36,13 @@ class DateMatchServiceApplicationTests {
 	List<String> tos = List.of("22","0","23","24","10","Nate");
 	
 	@Test
+	
+	public void testAddMatch() {
+		
+		matchService.addMatch("username", tos);
+	}
+	
+	@Test
 	@Order(1)
 	public void testdb () {
 		

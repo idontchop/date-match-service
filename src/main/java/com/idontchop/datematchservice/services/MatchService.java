@@ -39,21 +39,24 @@ public class MatchService {
 	 * 
 	 * @param username
 	 * @param to
-	 * @return
+	 * @return Match without from/to array
 	 */
 	public Match addMatch (String name, List<String> to ) {
-		Match user = retrieveOrAdd(name);
-		List<Match> toUser = retrieveOrAdd(to);
 		
+		// Find ( and create if necessary ) user record
+		Match user = retrieveOrAdd(name);	
+		
+		// Update reverse records
+		updateOrAddTos(name, to);
+		
+		// update user to record
 		Query query = new Query();
-		query.addCriteria(Criteria.where("name").is(name));
-		
-		Update update = new Update().addToSet("to").each(to);
-		
+		query.addCriteria(Criteria.where(DBNAME).is(name));		
+		Update update = new Update().addToSet(DBTO).each(to);		
 		mongoTemplate.updateFirst(query, update, Match.class);
 		
 		
-		return null;
+		return user;
 	}
 	
 	/**
@@ -67,6 +70,7 @@ public class MatchService {
 		
 		// Creates a list of users not found in db
 		// Easy but not optimal - Should collection useing MongoTemplate
+		// But this is likely never more than one at a time
 		List<String> adds = matchRepository.findNameByNameIn(to)
 				.stream().map(Match::getName).collect(Collectors.toList());
 		
@@ -97,7 +101,7 @@ public class MatchService {
 	 */
 	private Match retrieveOrAdd (String username ) {
 		 
-		Optional<Match> match = matchRepository.findByName(username);
+		Optional<Match> match = matchRepository.findNameByName(username);
 		
 		return match.orElseGet( () -> {			
 			return matchRepository.save( new Match (username) );
@@ -110,7 +114,7 @@ public class MatchService {
 	 * 
 	 * @param users
 	 * @return
-	 */
+	 *//* unused
 	private List<Match> retrieveOrAdd ( List <String> users ) {
 		
 		List<Match> retVal = new ArrayList<>();
@@ -119,6 +123,6 @@ public class MatchService {
 		});
 		
 		return retVal;
-	}
+	}*/
 
 }
