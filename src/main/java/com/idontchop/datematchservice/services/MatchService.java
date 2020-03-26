@@ -22,9 +22,9 @@ public class MatchService {
 	
 	// Database fields in the Match Document
 	// TODO: set these to property values
-	private final String DBNAME 	= 	"name";
-	private final String DBTO		=	"to";
-	private final String DBFROM		=	"from";
+	private final String NAMEFIELD 		= 	"name";
+	private final String TOFIELD		=	"to";
+	private final String FROMFIELD		=	"from";
 	
 	@Autowired
 	MongoTemplate mongoTemplate;
@@ -51,8 +51,8 @@ public class MatchService {
 		
 		// update user to record
 		Query query = new Query();
-		query.addCriteria(Criteria.where(DBNAME).is(name));		
-		Update update = new Update().addToSet(DBTO).each(to);		
+		query.addCriteria(Criteria.where(NAMEFIELD).is(name));		
+		Update update = new Update().addToSet(TOFIELD).each(to);		
 		mongoTemplate.updateFirst(query, update, Match.class);
 		
 		
@@ -87,9 +87,9 @@ public class MatchService {
 		
 		// Update those users already saved by using native mongo
 		Query query = new Query ();
-		query.addCriteria(Criteria.where(DBNAME).in(adds));
-		Update update = new Update().addToSet(DBTO, name);
-		mongoTemplate.updateFirst(query, update, Match.class);
+		query.addCriteria(Criteria.where(NAMEFIELD).in(adds));
+		Update update = new Update().addToSet(FROMFIELD, name);
+		mongoTemplate.updateMulti(query, update, Match.class);
 		
 	}
 	

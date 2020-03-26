@@ -3,6 +3,7 @@ package com.idontchop.datematchservice;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +36,18 @@ class DateMatchServiceApplicationTests {
 
 	List<String> tos = List.of("22","0","23","24","10","Nate");
 	
-	@Test
-	
+	@Test	
 	public void testAddMatch() {
 		
-		matchService.addMatch("username", tos);
+		assertTrue(tos.size() == 6);
+		Match match = matchService.addMatch("username", tos);
+		assertTrue ( match.getName() == "username");
+		List<String> ntos = new ArrayList<>(tos);
+		ntos.add("username");
+		match = matchService.addMatch("username2", ntos);
+		assertTrue ( match.getName() == "username2");
+		System.out.println(match);
+		
 	}
 	
 	@Test
@@ -84,7 +92,8 @@ class DateMatchServiceApplicationTests {
 	@Order(3)
 	public void testUpdate ( ) {
 		
-		matchService.updateOrAddTos("newUser", tos);
+		matchService.updateOrAddTos("newUser2", tos);
+		matchService.updateOrAddTos("newUser3", tos);
 		assertEquals(6,tos.size());
 		
 		List<Match> after = matchRepository.findNameByNameIn(tos);		
