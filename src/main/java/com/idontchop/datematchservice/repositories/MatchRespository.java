@@ -15,4 +15,5 @@ public interface MatchRespository extends MongoRepository<Match, String> {
 	@Query ( fields = "{name: 1}")
 	public List<Match> findNameByNameIn(List<String> name);
 	public Optional<Match> findNameByName(String user);
+	public void deleteByName(String user);
 }

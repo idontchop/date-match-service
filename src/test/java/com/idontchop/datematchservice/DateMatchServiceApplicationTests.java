@@ -14,10 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idontchop.datematchservice.entities.Match;
 import com.idontchop.datematchservice.repositories.MatchRespository;
 import com.idontchop.datematchservice.services.MatchService;
+import com.idontchop.datematchservice.services.ReduceService;
 
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
@@ -29,28 +33,64 @@ class DateMatchServiceApplicationTests {
 	@Autowired
 	MatchService matchService;
 	
+	@Autowired
+	ReduceService reduceService;
+	
 	@Test
 	void contextLoads() {
 	}
 	
 
-	List<String> tos = List.of("22","0","23","24","10","Nate");
+	List<String> tos = List.of("22","0","23","24","10","Nate","nada");
 	
-	@Test	
-	public void testAddMatch() {
+	//Arrays.asList(match(eq("name", "username")), 
+	//project(fields(excludeId(), computed("reduce", eq("$setIntersection", Arrays.asList(eq("$concatArrays", Arrays.asList("$to", "$from")), Arrays.asList("0")))))))
+	
+	@Test
+	public void aggregation () {
 		
-		assertTrue(tos.size() == 6);
-		Match match = matchService.addMatch("username", tos);
-		assertTrue ( match.getName() == "username");
-		List<String> ntos = new ArrayList<>(tos);
-		ntos.add("username");
-		match = matchService.addMatch("username2", ntos);
-		assertTrue ( match.getName() == "username2");
-		System.out.println(match);
+		ObjectMapper mapper = new ObjectMapper();
+		
+		List<Match> m = reduceService.findDifference("username", tos);
+		
+		// to keep a useless reduce field in the DB, I see one of two options:
+		// 1) extend the Match class to contain a reduce field
+		// 2) just map reduce to to field and only return to field.
+		
+		assertTrue (m.size() > 0);
+		//System.out.println(m.get(0).getTo().size() == 2);
+		assertEquals ( 6, m.get(0).getReduce().size());
+		assertTrue ( m.get(0).getReduce().get(0).equals( "0"));
+		assertTrue ( m.get(0).getReduce().get(1).equals("10"));
+		
+		
+		m.forEach( e -> {
+			try {
+				System.out.println( mapper.writeValueAsString(e) );
+			} catch (JsonProcessingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		
 	}
 	
 	@Test
+	public void testAddMatch() {
+		
+		String user = "Nada2";
+		String user2 = "Nada3";
+		Match match = matchService.addMatch(user, tos);
+		assertTrue ( match.getName().equals( user ));
+		List<String> ntos = new ArrayList<>(tos);
+		ntos.add(user);
+		match = matchService.addMatch(user2, ntos);
+		assertTrue ( match.getName().equals(user2));
+		System.out.println(match);
+		
+	}
+	
+	
 	@Order(1)
 	public void testdb () {
 		
@@ -73,7 +113,7 @@ class DateMatchServiceApplicationTests {
 		
 	}
 	
-	@Test
+	
 	@Order(2)
 	public void testFind () {
 		
@@ -88,7 +128,7 @@ class DateMatchServiceApplicationTests {
 		assertEquals(2,t.size());
 	}
 	
-	@Test
+	
 	@Order(3)
 	public void testUpdate ( ) {
 		

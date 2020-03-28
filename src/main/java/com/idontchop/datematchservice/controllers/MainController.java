@@ -52,7 +52,7 @@ public class MainController {
 	 * This will be used in services such as Blocks.
 	 * 
 	 * "Find users in potentials that are not in the database on this service."
-	 * "Find users that are not blocked by this user."
+	 * "Find users that are not blocked by this user or this user is blocked by."
 	 * 
 	 * @param reduceRequest
 	 * @return
@@ -78,6 +78,24 @@ public class MainController {
 	 */
 	@GetMapping (value = "/${spring.application.type}/intersection")
 	public RestMessage match(@RequestBody @Valid ReduceRequest reduceRequest) {
+		return RestMessage.build("good");
+	}
+	
+	/**
+	 * Returns connections (mutual matches) of the potentials list in Reduce Request
+	 * with respect to the supplied username in the database.
+	 * 
+	 * This is useful to find Connections.
+	 * 
+	 * "Find users in potentials in the database that also have the supplied
+	 * user in their TO list."
+	 * "Find users liked by this user who liked back."
+	 * 
+	 * @param reduceRequest
+	 * @return
+	 */
+	@GetMapping (value = "/${spring.application.type}/connection")
+	public RestMessage connection(@RequestBody @Valid ReduceRequest reduceRequest) {
 		return RestMessage.build("good");
 	}
 	

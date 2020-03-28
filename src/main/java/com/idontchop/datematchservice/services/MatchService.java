@@ -33,9 +33,34 @@ public class MatchService {
 	MatchRespository matchRepository;
 	
 	/**
+	 * Simply returns the requested users if found.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public List<Match> getUser ( List<String> name ) {
+		return matchRepository.findByNameIn(name);
+	}
+	
+	/**
+	 * Deletes the users. This doesn't check for database error.
+	 * 
+	 * @param name
+	 */
+	public void deleteUser ( List<String> name ) {
+		
+		name.forEach( user -> 
+			matchRepository.deleteByName(user)
+			);
+		
+	}
+	
+	/**
 	 * Simple add from username to...
 	 * 
 	 * Two records will need to be updated.
+	 * 
+	 * Always returns the User without his matches for performance.
 	 * 
 	 * @param username
 	 * @param to
