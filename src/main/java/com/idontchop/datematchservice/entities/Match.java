@@ -32,10 +32,6 @@ public class Match {
 	// Users who matched to this user
 	List<String> from	= new ArrayList<>();
 	
-	// Used for returning aggregations
-	@BsonIgnore
-	List<String> reduce = new ArrayList<>();
-	
 	public Match () {}
 	public Match(String name) {
 		this.name = name;
@@ -78,15 +74,6 @@ public class Match {
 	public void setFrom(List<String> from) {
 		this.from = from;
 	}
-	public List<String> getReduce() {
-		return reduce;
-	}
-	public void setReduce(List<String> reduce) {
-		this.reduce = reduce;
-	}
-
-	
-	
 	
 
 }

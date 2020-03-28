@@ -5,21 +5,16 @@ import java.util.List;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators.Filter;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
-import org.springframework.data.mongodb.core.aggregation.SetOperators.SetIntersection;
-import org.springframework.data.mongodb.core.aggregation.SetOperators.SetDifference;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.idontchop.datematchservice.dtos.MatchDto;
 import com.idontchop.datematchservice.entities.Match;
 import com.idontchop.datematchservice.repositories.MatchRespository;
 
@@ -32,28 +27,85 @@ public class ReduceService {
 	private final String TOFIELD		=	"to";
 	private final String FROMFIELD		=	"from";
 	
+	@Value ("${spring.application.type}")
+	private String matchType;
+	
 	@Autowired
 	MongoTemplate mongoTemplate;
 	
 	@Autowired
 	MatchRespository matchRepository;
 	
-	public List<Match> findDifference (String name, List<String> potentials ) {
+	private MatchDto agg ( MatchOperation matchStage, ProjectionOperation projectStage ) throws IndexOutOfBoundsException {
 		
-		// We need to pass the potentials into mongo db and someone have it find
-		// the difference and return just the array
-		// planning ahead for possibility of a user have thousands of records
-		// we can't return the array
-		// other possibility is checking each potential one by one
+		Aggregation agg = Aggregation.newAggregation(matchStage, projectStage);		
+		AggregationResults<MatchDto> out = mongoTemplate.aggregate(agg, matchType, MatchDto.class);
+		return out.getMappedResults().get(0);
+	}
+	
+	/**
+	 * findDifference. See MainController.java
+	 * 
+	 * @param name
+	 * @param potentials
+	 * @return
+	 * @throws IndexOutOfBoundsException
+	 */
+	public MatchDto findDifference (String name, List<String> potentials ) throws IndexOutOfBoundsException {
+		
 		MatchOperation matchStage = Aggregation.match(Criteria.where(NAMEFIELD).is(name));
 		ProjectionOperation projectStage = Aggregation.project()
-				.and( c ->  new Document ("$setIntersection", Arrays.asList( new Document ("$concatArrays", Arrays.asList("$to","$from")), potentials)))
+				.and( c ->  new Document ( "$setDifference", 
+						Arrays.asList( potentials,
+								new Document ("$concatArrays", Arrays.asList("$" + TOFIELD,"$" + FROMFIELD))
+								)))
 				.as("reduce");		
 
-		Aggregation agg = Aggregation.newAggregation(matchStage, projectStage);
+		return agg(matchStage, projectStage);
+	}
+	
+	/**
+	 * find Intersection. findDifference. See MainController.java
+	 * 
+	 * @param name
+	 * @param potentials
+	 * @param isTo true to use TOFIELD
+	 * @return
+	 * @throws IndexOutOfBoundsException
+	 */
+	public MatchDto findIntersection ( String name, List<String> potentials, boolean isTo ) throws IndexOutOfBoundsException {
 		
-		AggregationResults<Match> out = mongoTemplate.aggregate(agg, "match", Match.class);
-		return out.getMappedResults();
+		final String FIELD = isTo ? TOFIELD : FROMFIELD;
+		
+		MatchOperation matchStage = Aggregation.match(Criteria.where(NAMEFIELD).is(name));		
+		ProjectionOperation projectStage = Aggregation.project()
+				.and ( c -> new Document ( "$setIntersection",
+						Arrays.asList("$" + FIELD, potentials)
+						))
+				.as("reduce");
+		
+		return agg(matchStage, projectStage);
+	}
+	
+	/**
+	 * find 3 set intersection, uses TO and FROM field. See MainController.java
+	 * 
+	 * @param name
+	 * @param potentials
+	 * @return
+	 * @throws IndexOutOfBoundsException
+	 */
+	public MatchDto findFullIntersection ( String name, List<String> potentials) throws IndexOutOfBoundsException {
+		
+		MatchOperation matchStage = Aggregation.match(Criteria.where(NAMEFIELD).is(name));
+		ProjectionOperation projectStage = Aggregation.project()
+				.and( c-> new Document ( "$setIntersection",
+						Arrays.asList(potentials,
+								"$" + TOFIELD, "$" + FROMFIELD
+								)))
+				.as("reduce");
+		
+		return agg(matchStage, projectStage);					
 	}
 
 }

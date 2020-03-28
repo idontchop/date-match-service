@@ -18,6 +18,7 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idontchop.datematchservice.dtos.MatchDto;
 import com.idontchop.datematchservice.entities.Match;
 import com.idontchop.datematchservice.repositories.MatchRespository;
 import com.idontchop.datematchservice.services.MatchService;
@@ -41,7 +42,7 @@ class DateMatchServiceApplicationTests {
 	}
 	
 
-	List<String> tos = List.of("22","0","23","24","10","Nate","nada");
+	List<String> tos = List.of("22","0","23","24","10","Nate","nada","wtf");
 	
 	//Arrays.asList(match(eq("name", "username")), 
 	//project(fields(excludeId(), computed("reduce", eq("$setIntersection", Arrays.asList(eq("$concatArrays", Arrays.asList("$to", "$from")), Arrays.asList("0")))))))
@@ -51,35 +52,55 @@ class DateMatchServiceApplicationTests {
 		
 		ObjectMapper mapper = new ObjectMapper();
 		
-		List<Match> m = reduceService.findDifference("username", tos);
+		String u = "username";
+		
+		MatchDto m = reduceService.findDifference(u, tos);
 		
 		// to keep a useless reduce field in the DB, I see one of two options:
 		// 1) extend the Match class to contain a reduce field
 		// 2) just map reduce to to field and only return to field.
 		
-		assertTrue (m.size() > 0);
+		assertTrue (m != null);
 		//System.out.println(m.get(0).getTo().size() == 2);
-		assertEquals ( 6, m.get(0).getReduce().size());
-		assertTrue ( m.get(0).getReduce().get(0).equals( "0"));
-		assertTrue ( m.get(0).getReduce().get(1).equals("10"));
+		assertEquals ( 2, m.getReduce().size());
+		assertTrue ( m.getReduce().get(0).equals( "nada"));
+		assertTrue ( m.getReduce().get(1).equals("wtf"));
 		
 		
-		m.forEach( e -> {
-			try {
-				System.out.println( mapper.writeValueAsString(e) );
-			} catch (JsonProcessingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		});
+		
+		try {
+			System.out.println( mapper.writeValueAsString(m.getReduce()) );
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		m = reduceService.findIntersection(u, tos, true);
+		assertEquals (6, m.getReduce().size());
+		
+		List<String> tof = List.of("22","username2");
+		List<String> tofc = List.of("conn", "conn2");
+		m = reduceService.findIntersection(u, tof, true);
+		assertEquals (1, m.getReduce().size());
+		
+		m = reduceService.findIntersection(u, tof, false);
+		assertEquals (1, m.getReduce().size());
+		
+		m = reduceService.findFullIntersection(u, tos);
+		assertEquals (0, m.getReduce().size());
+		
+		m = reduceService.findFullIntersection(u, tofc);
+		assertEquals (2, m.getReduce().size());
+		
+		
 		
 	}
 	
-	@Test
+	
 	public void testAddMatch() {
 		
-		String user = "Nada2";
-		String user2 = "Nada3";
+		String user = "username";
+		String user2 = "username2";
 		Match match = matchService.addMatch(user, tos);
 		assertTrue ( match.getName().equals( user ));
 		List<String> ntos = new ArrayList<>(tos);
@@ -89,6 +110,7 @@ class DateMatchServiceApplicationTests {
 		System.out.println(match);
 		
 	}
+	
 	
 	
 	@Order(1)
