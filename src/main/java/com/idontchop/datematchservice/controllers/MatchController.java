@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,6 +79,17 @@ public class MatchController {
 	@GetMapping ( value = "${spring.application.type}/{from}" )
 	public List<Match> getMatch ( @PathVariable (name = "from", required = true) List<String> from ) {
 		return matchService.getUser(from);
+	}
+	
+	/**
+	 * No return value.
+	 * 200 if found
+	 * 404 if not found
+	 */
+	@GetMapping ( value = "${spring.application.type}/{from}/{to}")
+	public ResponseEntity<String> getSpecificMatch ( @PathVariable ( name = "from", required = true) String from,
+			@PathVariable ( name = "to", required = true ) String to ) {
+		return ResponseEntity.ok().build();
 	}
 	
 

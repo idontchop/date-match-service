@@ -43,6 +43,21 @@ public class MatchService {
 	}
 	
 	/**
+	 * Will need a set of booleans that find matches of certain types
+	 * when we don't want to return the whole list.
+	 * 
+	 *  unidirectional and bidirectional
+	 *  
+	 * @param name
+	 * @param to
+	 * @return
+	 */
+	public boolean userHasMatch ( String name, String to ) {
+		
+		return false;
+	}
+	
+	/**
 	 * Deletes the users. This doesn't check for database error.
 	 * 
 	 * @param name
