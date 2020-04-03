@@ -47,7 +47,23 @@ class DateMatchServiceApplicationTests {
 	//Arrays.asList(match(eq("name", "username")), 
 	//project(fields(excludeId(), computed("reduce", eq("$setIntersection", Arrays.asList(eq("$concatArrays", Arrays.asList("$to", "$from")), Arrays.asList("0")))))))
 	
+	
 	@Test
+	public void testUserHasMatch() {
+		
+		String username = "username";
+		
+		assertTrue (matchService.userHasMatch(username, "22", true, false) );
+		assertTrue (!matchService.userHasMatch(username,"1111", true, false));
+		assertTrue (matchService.userHasMatch(username, "username2", false, true));
+		assertTrue (!matchService.userHasMatch(username, "1111", false, true));
+		assertTrue (matchService.userHasMatch(username, "conn", true, true));
+		assertTrue (matchService.userHasMatch(username, "conn2", true, true));
+		assertTrue (!matchService.userHasMatch(username, "username2", true, true));
+		assertTrue (!matchService.userHasMatch(username, "Nate", true, true));
+	}
+	
+	
 	public void aggregation () {
 		
 		ObjectMapper mapper = new ObjectMapper();

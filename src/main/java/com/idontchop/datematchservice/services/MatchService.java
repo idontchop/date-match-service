@@ -48,13 +48,36 @@ public class MatchService {
 	 * 
 	 *  unidirectional and bidirectional
 	 *  
-	 * @param name
-	 * @param to
+	 * @param name user document to check
+	 * @param to user to search for
+	 * @param checkTo if true, will check if exists in TO field
+	 * @param checkFrom
 	 * @return
 	 */
-	public boolean userHasMatch ( String name, String to ) {
+	public boolean userHasMatch ( String name, String to, boolean checkTo, boolean checkFrom ) {
 		
-		return false;
+		Criteria toCriteria = Criteria.where(TOFIELD).all(to);
+		Criteria fromCriteria = Criteria.where(FROMFIELD).all(to);
+		
+		Criteria searchCriteria = new Criteria();
+		
+		if ( checkTo && checkFrom ) { // match in both			
+			searchCriteria.andOperator(toCriteria, fromCriteria);
+		} else if ( checkTo ) {
+			searchCriteria = toCriteria;
+		} else if ( checkFrom ) {
+			searchCriteria = fromCriteria;
+		} else {
+			throw new IllegalArgumentException ("MatchService userHasMatch received no arguments.");
+		}
+		
+		Query query = new Query();
+		
+		query.addCriteria( searchCriteria );
+		
+		// If found at least one occurence, the match exists
+		return mongoTemplate.count(query, Match.class) > 0;
+		
 	}
 	
 	/**
