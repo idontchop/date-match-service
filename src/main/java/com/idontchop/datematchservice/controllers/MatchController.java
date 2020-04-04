@@ -85,11 +85,28 @@ public class MatchController {
 	 * No return value.
 	 * 200 if found
 	 * 404 if not found
+	 * 
+	 * switch can be to / from / both
 	 */
-	@GetMapping ( value = "${spring.application.type}/{from}/{to}")
+	@GetMapping ( value = "${spring.application.type}/{choice}/{from}/{to}")
 	public ResponseEntity<String> getSpecificMatch ( @PathVariable ( name = "from", required = true) String from,
+			@PathVariable ( name = "choice", required = true) String choice,
 			@PathVariable ( name = "to", required = true ) String to ) {
-		return ResponseEntity.ok().build();
+		
+		// build arguments 
+		boolean checkTo = false, checkFrom = false;
+		if ( choice.equalsIgnoreCase("to")) {
+			checkTo = true;
+		} else if ( choice.equalsIgnoreCase("from")) {
+			checkFrom = true;
+		} else if ( choice.equalsIgnoreCase("both")) {
+			checkTo = true; checkFrom = true;
+		} else {
+			return ResponseEntity.badRequest().body("choice allowed arguments: to/from/both");
+		}
+		
+		return matchService.userHasMatch(from, to, checkTo, checkFrom) ? 
+				ResponseEntity.ok().build() : ResponseEntity.notFound().build();
 	}
 	
 
