@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,7 +72,7 @@ public class MainController {
 	 * @param reduceRequest
 	 * @return
 	 */
-	@GetMapping(value = "/${spring.application.type}/difference")
+	@PostMapping(value = "/${spring.application.type}/difference")
 	public List<String> reduce(@RequestBody @Valid ReduceRequest reduceRequest) {
 		return reduceService
 				.findDifference(reduceRequest.getName(), reduceRequest.getPotentials())
@@ -92,7 +93,7 @@ public class MainController {
 	 * @param reduceRequest
 	 * @return
 	 */
-	@GetMapping (value = "/${spring.application.type}/intersection/to")
+	@PostMapping (value = "/${spring.application.type}/intersection/to")
 	public List<String> liked(@RequestBody @Valid ReduceRequest reduceRequest) {
 		return reduceService
 				.findIntersection(reduceRequest.getName(), reduceRequest.getPotentials(), true)
@@ -107,7 +108,7 @@ public class MainController {
 	 * @param reduceRequest
 	 * @return
 	 */
-	@GetMapping (value = "/${spring.application.type}/intersection/from")
+	@PostMapping (value = "/${spring.application.type}/intersection/from")
 	public List<String> isLiked(@RequestBody @Valid ReduceRequest reduceRequest) {
 		return reduceService
 				.findIntersection(reduceRequest.getName(), reduceRequest.getPotentials(), false)
@@ -127,7 +128,7 @@ public class MainController {
 	 * @param reduceRequest
 	 * @return
 	 */
-	@GetMapping (value = "/${spring.application.type}/connection")
+	@PostMapping (value = "/${spring.application.type}/connection")
 	public List<String> connection(@RequestBody @Valid ReduceRequest reduceRequest) {
 		return reduceService
 				.findFullIntersection(reduceRequest.getName(), reduceRequest.getPotentials())
