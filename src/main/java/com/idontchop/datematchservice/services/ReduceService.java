@@ -39,7 +39,7 @@ public class ReduceService {
 	private MatchDto agg ( MatchOperation matchStage, ProjectionOperation projectStage ) throws IndexOutOfBoundsException {
 		
 		Aggregation agg = Aggregation.newAggregation(matchStage, projectStage);		
-		AggregationResults<MatchDto> out = mongoTemplate.aggregate(agg, matchType, MatchDto.class);
+		AggregationResults<MatchDto> out = mongoTemplate.aggregate(agg, "match", MatchDto.class);
 		return out.getMappedResults().get(0);
 	}
 	

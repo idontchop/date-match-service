@@ -14,9 +14,13 @@ public class MongoConfig {
 	@Value ("${spring.datasource.mongo.database}")
 	private String dbName;
 	
-	//@Value ("${spring.application.type}")
-	//private String matchType;
-  
+	@Value ("${spring.application.type}")
+	private String matchType;
+ 
+	public String getCollectionName() {
+		return matchType;
+	}
+	
     @Bean
     public MongoClient mongo() {
         return MongoClients.create();
