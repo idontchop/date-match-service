@@ -1,27 +1,4 @@
-spring:
-  application:
-    name: ${SERVICE:match-service}
-    type: ${MATCH:match}
-  datasource:
-    mongo:
-      database: ${MONGODB:match}
-  data:
-    rest:
-      basePath: /data
-server:
-  port: ${PORT:8930}
-eureka:
-  instance:
-    hostname: localhost
-    metadataMap:
-      zone: zone1
-logging:
-  level:
-    org:
-      springframework: info
-    hibernate:
-      SQL: debug
-    com: debug
+
 
 
       

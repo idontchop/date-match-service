@@ -48,7 +48,7 @@ class DateMatchServiceApplicationTests {
 	//project(fields(excludeId(), computed("reduce", eq("$setIntersection", Arrays.asList(eq("$concatArrays", Arrays.asList("$to", "$from")), Arrays.asList("0")))))))
 	
 	
-	@Test
+	
 	public void testUserHasMatch() {
 		
 		String username = "username";
