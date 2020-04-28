@@ -42,6 +42,8 @@ import com.idontchop.datematchservice.services.ReduceService;
 @RestController
 public class MainController {
 	
+	private final String 	NOREDUCETAG		=	"NOREDUCE-GG";
+	
 	@Value ("${spring.application.type}")
 	private String matchType;
 	
@@ -138,12 +140,15 @@ public class MainController {
 	/**
 	 * All IndexOutofBounds Exception mean the username was not found.
 	 * 
+	 * NOREDUCETAG is a key set in search-service SearchPotentialsApi that allows for
+	 * a reduce that is skipped.
+	 * 
 	 * @param ex
 	 * @return
 	 */
 	@ExceptionHandler (IndexOutOfBoundsException.class)
-	public ResponseEntity<String> handleOutOfBounds ( IndexOutOfBoundsException ex ) {
-		return ResponseEntity.notFound().build();
+	public List<String> handleOutOfBounds ( IndexOutOfBoundsException ex ) {
+		return List.of(NOREDUCETAG);		
 	}
 	
 	@GetMapping("/helloWorld")
