@@ -3,6 +3,7 @@ package com.idontchop.datematchservice.services;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,6 +41,53 @@ public class MatchService {
 	 */
 	public List<Match> getUser ( List<String> name ) {
 		return matchRepository.findByNameIn(name);
+	}
+	
+	/**
+	 * Returns the user's tofield
+	 * 
+	 * @param username
+	 * @return
+	 */
+	public List<String> getUserMatch ( String username ) throws NoSuchElementException {
+		
+		return matchRepository.findByName(username)
+			.orElseThrow()
+			.getTo();
+	}
+	
+	/**
+	 * Returns the user's fromfield
+	 * 
+	 * @param username
+	 * @return
+	 * @throws NoSuchElementException
+	 */
+	public List<String> getUserIsMatch ( String username ) throws NoSuchElementException {
+		
+		return matchRepository.findByName(username)
+				.orElseThrow()
+				.getFrom();
+	}
+	
+	/**
+	 * Returns the user's connections. (users that exist in tofield and fromfield)
+	 * 
+	 * @param username
+	 * @return
+	 * @throws NoSuchElementException
+	 */
+	public List<String> getUserConnections ( String username ) throws NoSuchElementException {
+		
+		Match user = matchRepository.findByName(username)
+				.orElseThrow();
+		
+		return user
+				.getFrom()
+				.stream()
+				.filter( u -> user.getTo().contains(u) )
+				.collect(Collectors.toList());
+				
 	}
 	
 	/**
