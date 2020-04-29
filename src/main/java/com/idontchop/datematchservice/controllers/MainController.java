@@ -41,9 +41,7 @@ import com.idontchop.datematchservice.services.ReduceService;
  */
 @RestController
 public class MainController {
-	
-	private final String 	NOREDUCETAG		=	"NOREDUCE-GG";
-	
+		
 	@Value ("${spring.application.type}")
 	private String matchType;
 	
@@ -58,6 +56,8 @@ public class MainController {
 	
 	@Autowired
 	ReduceService reduceService;
+	
+	private Iterable<String> requestPotentials = List.of();
 	
 	
 	/**
@@ -76,6 +76,7 @@ public class MainController {
 	 */
 	@PostMapping(value = "/${spring.application.type}/difference")
 	public List<String> reduce(@RequestBody @Valid ReduceRequest reduceRequest) {
+		requestPotentials = reduceRequest.getPotentials();	// necessary for indexoutofbounds
 		return reduceService
 				.findDifference(reduceRequest.getName(), reduceRequest.getPotentials())
 				.getReduce();
@@ -97,6 +98,7 @@ public class MainController {
 	 */
 	@PostMapping (value = "/${spring.application.type}/intersection/to")
 	public List<String> liked(@RequestBody @Valid ReduceRequest reduceRequest) {
+		requestPotentials = reduceRequest.getPotentials();	// necessary for indexoutofbounds
 		return reduceService
 				.findIntersection(reduceRequest.getName(), reduceRequest.getPotentials(), true)
 				.getReduce();
@@ -112,6 +114,7 @@ public class MainController {
 	 */
 	@PostMapping (value = "/${spring.application.type}/intersection/from")
 	public List<String> isLiked(@RequestBody @Valid ReduceRequest reduceRequest) {
+		requestPotentials = reduceRequest.getPotentials();	// necessary for indexoutofbounds
 		return reduceService
 				.findIntersection(reduceRequest.getName(), reduceRequest.getPotentials(), false)
 				.getReduce();
@@ -132,6 +135,7 @@ public class MainController {
 	 */
 	@PostMapping (value = "/${spring.application.type}/connection")
 	public List<String> connection(@RequestBody @Valid ReduceRequest reduceRequest) {
+		requestPotentials = reduceRequest.getPotentials();	// necessary for indexoutofbounds
 		return reduceService
 				.findFullIntersection(reduceRequest.getName(), reduceRequest.getPotentials())
 				.getReduce();
@@ -147,8 +151,8 @@ public class MainController {
 	 * @return
 	 */
 	@ExceptionHandler (IndexOutOfBoundsException.class)
-	public List<String> handleOutOfBounds ( IndexOutOfBoundsException ex ) {
-		return List.of(NOREDUCETAG);		
+	public Iterable<String> handleOutOfBounds ( IndexOutOfBoundsException ex ) {
+		return requestPotentials;
 	}
 	
 	@GetMapping("/helloWorld")
