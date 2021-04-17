@@ -1,3 +1,22 @@
+spring:
+  application:
+    name: ${SERVICE:like-service}
+    type: ${MATCH:like}
+  datasource:
+    mongo:
+      database: ${MONGODB:block}
+  data:
+    rest:
+      basePath: /data
+server:
+  port: ${PORT:8931}
+logging:
+  level:
+    org:
+      springframework: info
+    hibernate:
+      SQL: debug
+    com: debug
 
 
 
