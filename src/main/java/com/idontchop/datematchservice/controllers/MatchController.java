@@ -55,17 +55,26 @@ public class MatchController {
 	/**
 	 * Add Match
 	 * 
+	 * deprecated - before JWT
+	 * 
 	 * @param from
 	 * @param to
 	 * @return Match
-	 */
+	 *
 	@RequestMapping ( 	value = "/${spring.application.type}/{from}/{to}",
 						method = { RequestMethod.POST, RequestMethod.PUT} )
 	public Match addMatch (	@PathVariable (name = "from", required = true) String from,
 							@PathVariable (name = "to", required = true ) List<String> to) {
 		return matchService.addMatch(from, to);
+	}*/
+
+	@RequestMapping ( 	value = "/${spring.application.type}/{to}",
+			method = { RequestMethod.POST, RequestMethod.PUT} )
+	public Match addMatch (	@PathVariable (name = "to", required = true ) List<String> to,
+							Principal principal) {
+		return matchService.addMatch(principal.getName(), to);
 	}
-	
+
 	/**
 	 * Delete Match. This deletes a match made the user.
 	 */
