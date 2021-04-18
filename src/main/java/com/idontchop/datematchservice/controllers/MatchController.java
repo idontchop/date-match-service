@@ -1,5 +1,6 @@
 package com.idontchop.datematchservice.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -11,11 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.idontchop.datematchservice.dtos.ReduceRequest;
 import com.idontchop.datematchservice.dtos.RestMessage;
 import com.idontchop.datematchservice.entities.Match;
 import com.idontchop.datematchservice.services.MatchService;
@@ -63,12 +67,20 @@ public class MatchController {
 	}
 	
 	/**
-	 * Delete Match
+	 * Delete Match. This deletes a match made the user.
+	 */
+	@DeleteMapping ( value = "/${spring.application.type}/{to}")
+	public Match deleteMatch ( @PathVariable (name = "to", required = true) String to, Principal principal) {
+		return matchService.deleteMatch(principal.getName(), to);
+	}
+	
+	/**
+	 * Delete User
 	 * @param from
 	 * @return Always "OK"
 	 */
-	@DeleteMapping ( value = "${spring.application.type}/{from}" )
-	public RestMessage deleteMatch ( @PathVariable (name = "from", required = true) List<String> from ) {
+	@DeleteMapping ( value = "${spring.application.type}/deleteUser/{from}" )
+	public RestMessage deleteUser ( @PathVariable (name = "from", required = true) List<String> from ) {
 		matchService.deleteUser(from);
 		return RestMessage.build("OK");
 	}
@@ -82,6 +94,27 @@ public class MatchController {
 	@GetMapping ( value = "${spring.application.type}/{from}" )
 	public List<Match> getMatch ( @PathVariable (name = "from", required = true) List<String> from ) {
 		return matchService.getUser(from);
+	}
+	
+	@GetMapping ( value = "${spring.application.type}/MyMatches" )
+	public Match getMyMatches (Principal principal) {
+		return matchService.getUser(principal.getName());
+	}
+	
+	/**
+	 * 	/like/MyMatchesReduce
+	 * 
+	 * Allows frontend to supply a list of potentials to reduce the Match returned.
+	 * 
+	 * This is useful for the feed so frontend only deals with users who are in the feed.
+	 * 
+	 * @param reduceRequest
+	 * @param principal
+	 * @return
+	 */
+	@PostMapping ( value = "${spring.application.type}/MyMatchesReduce")
+	public Match getMyMatchesWithReduce (@RequestBody ReduceRequest reduceRequest, Principal principal) {
+		return matchService.getUserWithReduce(principal.getName(), reduceRequest.getPotentials());
 	}
 	
 	/**

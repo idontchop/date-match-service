@@ -68,6 +68,12 @@ public class Match {
 	public void addTo (String name) {
 		to.add(name);
 	}
+	public void deleteFrom(String name) {
+		from.remove(name);
+	}
+	public void deleteTo(String name) {
+		to.remove(name);
+	}
 	public List<String> getFrom() {
 		return from;
 	}

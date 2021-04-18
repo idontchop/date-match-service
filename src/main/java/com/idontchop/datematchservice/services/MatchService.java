@@ -44,6 +44,25 @@ public class MatchService {
 	}
 	
 	/**
+	 * Returns the Match document if found. If not found, returns empty.
+	 * @param name
+	 * @return
+	 */
+	public Match getUser (String name) {
+		return matchRepository.findByName(name).orElse(new Match());
+	}
+	
+	public Match getUserWithReduce (String name, List<String> potentials) {
+		
+		Match match = getUser(name);
+		match.setFrom(match.getFrom().stream().filter( from -> potentials.contains(from)).collect(Collectors.toList()));
+		match.setTo(match.getTo().stream().filter( to -> potentials.contains(to)).collect(Collectors.toList()));
+		
+		return match;
+		
+	}
+	
+	/**
 	 * Returns the user's tofield
 	 * 
 	 * @param username
@@ -142,6 +161,24 @@ public class MatchService {
 	}
 	
 	/**
+	 * Deletes the match, deletes from both user's records
+	 * 
+	 * If the match it is attemptign to delete doesn't exist, it creates the
+	 * from user match.
+	 */
+	public Match deleteMatch(String from, String to) {
+		
+		matchRepository.findByName(to).ifPresent( m -> {
+			m.deleteFrom(from);
+			matchRepository.save(m);
+		});
+		
+		Match fromMatch = matchRepository.findByName(from).orElse(new Match(from));
+		fromMatch.deleteTo(to);
+		return matchRepository.save(fromMatch);
+	}
+	
+	/**
 	 * Simple add from username to...
 	 * 
 	 * Two records will need to be updated.
@@ -167,7 +204,7 @@ public class MatchService {
 		mongoTemplate.updateFirst(query, update, Match.class);
 		
 		
-		return user;
+		return matchRepository.findByName(name).orElseThrow();
 	}
 	
 	/**

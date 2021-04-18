@@ -141,6 +141,7 @@ public class MainController {
 				.getReduce();
 	}
 	
+	
 	/**
 	 * All IndexOutofBounds Exception mean the username was not found.
 	 * 
