@@ -57,7 +57,7 @@ public class MatchController {
 	 * 
 	 * deprecated - before JWT
 	 * 
-	 * @param from
+	 * @param fromId
 	 * @param to
 	 * @return Match
 	 *

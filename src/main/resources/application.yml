@@ -2,12 +2,22 @@ spring:
   application:
     name: ${SERVICE:like-service}
     type: ${MATCH:like}
+    topic: ${TOPIC:match}
   datasource:
     mongo:
       database: ${MONGODB:block}
   data:
     rest:
       basePath: /data
+  kafka:
+    consumer:
+      bootstrap-servers: staging:9092
+      group-id: MediaService
+      auto-offset-reset: earliest
+    properties:
+      spring.json.trusted.packages: "com.lovemire.date-media-service"
+    producer:
+      bootstrap-servers: staging:9092
 server:
   port: ${PORT:8931}
 logging:

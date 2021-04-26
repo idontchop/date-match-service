@@ -33,6 +33,9 @@ public class MatchService {
 	@Autowired
 	MatchRespository matchRepository;
 	
+	@Autowired
+	MessageService messageService;
+	
 	/**
 	 * Simply returns the requested users if found.
 	 * 
@@ -203,6 +206,13 @@ public class MatchService {
 		Update update = new Update().addToSet(TOFIELD).each(to);		
 		mongoTemplate.updateFirst(query, update, Match.class);
 		
+		// Send new match message:
+		// TODO: a bug exists here if the frontend sent a match that already existed.
+		// Multiple notifications would be created (not a big deal until a bad actor)
+		to.forEach( t -> {
+			messageService.sendMatch(name, t);
+		});
+		// end message block
 		
 		return matchRepository.findByName(name).orElseThrow();
 	}
@@ -251,9 +261,7 @@ public class MatchService {
 		 
 		Optional<Match> match = matchRepository.findNameByName(username);
 		
-		return match.orElseGet( () -> {			
-			return matchRepository.save( new Match (username) );
-		}); 
+		return match.orElseGet( () -> matchRepository.save( new Match (username) )); 
 	}
 	
 	/**
