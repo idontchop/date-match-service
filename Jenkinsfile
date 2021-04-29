@@ -21,9 +21,9 @@ pipeline {
         stage('Build docker image') {
              steps {
                 sh '''
-                    docker build -t ${IMAGE} .
-                    docker tag ${IMAGE} ${IMAGE}:${VERSION}
-                    docker push ${IMAGE}:${VERSION}
+                    /usr/bin/docker build -t ${IMAGE} .
+                    /usr/bin/docker tag ${IMAGE} ${IMAGE}:${VERSION}
+                    /usr/bin/docker push ${IMAGE}:${VERSION}
                 '''
             }
         }
