@@ -178,6 +178,10 @@ public class MatchService {
 		
 		Match fromMatch = matchRepository.findByName(from).orElse(new Match(from));
 		fromMatch.deleteTo(to);
+		
+		// Sends 'matchDeleted' message
+		messageService.sendDelete(from, to);
+		
 		return matchRepository.save(fromMatch);
 	}
 	
