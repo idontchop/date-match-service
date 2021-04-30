@@ -1,0 +1,1 @@
+docker run -d --rm --name $IMAGE -p 8931:8931 192.168.1.55:5000/$IMAGE

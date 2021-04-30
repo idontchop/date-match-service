@@ -36,7 +36,14 @@ pipeline {
         stage('Build docker image') {
              steps {
                 sh '''
-		 sh ./buildDockerImage.sh
+		            sh ./jenkins/buildDockerImage.sh
+                '''
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh '''
+                    sh ./jenkins/deployDockerImage.sh
                 '''
             }
         }
