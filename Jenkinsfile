@@ -2,8 +2,8 @@ pipeline {
     
     agent {
         docker {
-            image 'openjdk:11-jdk'
-            reuseNode true
+            image 'maven:3.8.1-adoptopenjdk-11' 
+            args '-v /home/jenkins/.m2:/home/jenkins/.m2' 
         }
     }
     
