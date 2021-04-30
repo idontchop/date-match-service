@@ -1,5 +1,11 @@
 pipeline {
     
+    agent any
+    tools {
+        maven 'Maven 3.3.9'
+        jdk 'jdk11'
+    }
+    
     environment {
         //Use Pipeline Utility Steps plugin to read information from pom.xml into env variables
         IMAGE = readMavenPom().getArtifactId()
