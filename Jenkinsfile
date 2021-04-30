@@ -37,9 +37,9 @@ pipeline {
              steps {
                 sh '''
                     whereis docker
-                    /snap/bin/docker build -t ${IMAGE} .
-                    /snap/bin/docker tag ${IMAGE} ${IMAGE}:${VERSION}
-                    /snap/bin/docker push ${IMAGE}:${VERSION}
+                    docker build -t ${IMAGE} .
+                    docker tag ${IMAGE} ${IMAGE}:${VERSION}
+                    docker push ${IMAGE}:${VERSION}
                 '''
             }
         }
