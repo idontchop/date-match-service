@@ -36,6 +36,8 @@ pipeline {
         stage('Build docker image') {
              steps {
                 sh '''
+                export IMAGE
+                export VERSION
 		            sh ./jenkins/buildDockerImage.sh
                 '''
             }
@@ -43,6 +45,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
+                export IMAGE
+                export VERSION
                     sh ./jenkins/deployDockerImage.sh
                 '''
             }
