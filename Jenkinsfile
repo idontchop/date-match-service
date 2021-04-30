@@ -22,7 +22,7 @@ pipeline {
         stage('Build image') {
             agent {
                 docker {
-                    image 'dind'
+                    image 'docker'
                     args '--privileged'
                 }
             }
