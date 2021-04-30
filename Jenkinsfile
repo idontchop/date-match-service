@@ -36,10 +36,7 @@ pipeline {
         stage('Build docker image') {
              steps {
                 sh '''
-                    whereis docker
-                    docker build -t ${IMAGE} .
-                    docker tag ${IMAGE} ${IMAGE}:${VERSION}
-                    docker push ${IMAGE}:${VERSION}
+		 sh ./buildDockerImage.sh
                 '''
             }
         }
