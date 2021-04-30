@@ -20,6 +20,7 @@ pipeline {
             }
         }
         stage('Build image') {
+            def app
             app = docker.build("match-service")
         }
 /*        stage('Build docker image') {
