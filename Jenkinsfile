@@ -20,6 +20,12 @@ pipeline {
             }
         }
         stage('Build image') {
+            agent {
+                docker {
+                    image 'dind'
+                    args '--privileged'
+                }
+            }
             steps {
                 script {
                     def app
