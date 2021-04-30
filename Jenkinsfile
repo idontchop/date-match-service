@@ -19,7 +19,10 @@ pipeline {
                 sh 'mvn -B -DskipTests clean package' 
             }
         }
-        stage('Build docker image') {
+        stage('Build image') {
+            app = docker.build("match-service")
+        }
+/*        stage('Build docker image') {
              steps {
                 sh '''
                     /snap/bin/docker build -t ${IMAGE} .
@@ -27,6 +30,6 @@ pipeline {
                     /snap/bin/docker push ${IMAGE}:${VERSION}
                 '''
             }
-        }
+        }*/
     }
 }
